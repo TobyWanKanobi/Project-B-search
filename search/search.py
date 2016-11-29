@@ -86,8 +86,50 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    searchhead = problem.getStartState()
+    stack = util.Stack()
+    stack.push((problem.getStartState(), None))
+    visited = []
+    parentlinks = {} # Een dictionary key, value; Waarin key de tile is waaruit de value tile ontdekt is
+
+    while not stack.isEmpty():
+
+        searchhead = stack.pop()
+
+        if problem.isGoalState(searchhead[0]):
+            break
+
+        if searchhead[0] in visited: # Locatie is al een keer bezocht... ga direct naar volgende iteratie
+            continue
+
+        visited.append(searchhead[0]) # voeg node toe aan bezochte nodes
+        successors = problem.getSuccessors(searchhead[0])
+        parentlinks[searchhead] = successors # voeg alle ontdekte childs
+
+        for child in successors:
+            if child[0] not in visited:
+                stack.push(child)
+
+    # Achterhalen wat het exacte pad van startpositie naar goal is:
+    childOf = searchhead
+    route = util.Stack() # maak een nieuwe stack om het pad (start naar doel) in te stoppen (van goal naar startpositie)
+    route.push(childOf) # push laatste actie naar doel op stack
+
+    while not childOf[0] == problem.getStartState():
+
+        for key, value in parentlinks.iteritems():
+            for v in value:
+                if v == childOf:
+                    if key[0] != problem.getStartState():
+                        route.push(key)
+                    childOf = key
+                    break
+
+    actions = []
+    while not route.isEmpty(): # pop de stack leeg en voeg de acties toe aan de actielijst
+        actions.append(route.pop()[1])
+
+    return actions
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
