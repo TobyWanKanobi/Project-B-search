@@ -111,23 +111,22 @@ def depthFirstSearch(problem):
                 stack.push(child)
 
     # Achterhalen wat het exacte pad van startpositie naar goal is:
-    childOf = searchhead
-    route = util.Stack() # maak een nieuwe stack om het pad (start naar doel) in te stoppen (van goal naar startpositie)
-    route.push(childOf) # push laatste actie naar doel op stack
+    reversedPath = util.Stack() # nieuwe stack om pad in op te slaan
+    reversedPath.push(searchhead) # push laatst bezochte locatie op stack (goal)
 
-    while not childOf[0] == problem.getStartState():
+    while not searchhead[0] == problem.getStartState(): # loop totdat je terug bent bij startpositie
 
-        for key, value in parentlinks.iteritems():
-            for v in value:
-                if v == childOf:
-                    if key[0] != problem.getStartState():
-                        route.push(key)
-                    childOf = key
+        for parent, children in parentlinks.iteritems():
+            for child in children:
+                if child == searchhead:
+                    if parent[0] != problem.getStartState():
+                        reversedPath.push(parent)
+                    searchhead = parent
                     break
 
     actions = []
-    while not route.isEmpty(): # pop de stack leeg en voeg de acties toe aan de actielijst
-        actions.append(route.pop()[1])
+    while not reversedPath.isEmpty(): # pop de stack leeg en voeg de acties toe aan de actielijst
+        actions.append(reversedPath.pop()[1])
 
     return actions
 
