@@ -86,49 +86,32 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
-    searchhead = problem.getStartState()
-    stack = util.Stack()
-    stack.push((problem.getStartState(), None))
+    fringe = util.Stack()
+    fringe.push((problem.getStartState(), []))
     visited = []
-    parentlinks = {} # Een dictionary key, value; Waarin key de tile is waaruit de value tile ontdekt is
 
-    while not stack.isEmpty():
+    while not fringe.isEmpty():
 
-        searchhead = stack.pop()
+        # verkrijg locatie en acties uit fringe
+        location, actions = fringe.pop()
 
-        if problem.isGoalState(searchhead[0]):
-            break
+        # return acties wanneer doelstate bereikt is
+        if problem.isGoalState(location):
+            return actions
 
-        if searchhead[0] in visited: # Locatie is al een keer bezocht... ga direct naar volgende iteratie
+        # Locatie is al een keer bezocht... ga direct naar volgende iteratie
+        if location in visited:
             continue
 
-        visited.append(searchhead[0]) # voeg node toe aan bezochte nodes
-        successors = problem.getSuccessors(searchhead[0])
-        parentlinks[searchhead] = successors # voeg alle ontdekte childs
+        # Markeer locatie als bezocht
+        visited.append(location)
 
-        for child in successors:
-            if child[0] not in visited:
-                stack.push(child)
+        # Klap node uit
+        successors = problem.getSuccessors(location)
+        for state, action, cost in successors:
+            fringe.push((state, actions + [action]))
 
-    # Achterhalen wat het exacte pad van startpositie naar goal is:
-    reversedPath = util.Stack() # nieuwe stack om pad in op te slaan
-    reversedPath.push(searchhead) # push laatst bezochte locatie op stack (goal)
-
-    while not searchhead[0] == problem.getStartState(): # loop totdat je terug bent bij startpositie
-
-        for parent, children in parentlinks.iteritems():
-            for child in children:
-                if child == searchhead:
-                    if parent[0] != problem.getStartState():
-                        reversedPath.push(parent)
-                    searchhead = parent
-                    break
-
-    actions = []
-    while not reversedPath.isEmpty(): # pop de stack leeg en voeg de acties toe aan de actielijst
-        actions.append(reversedPath.pop()[1])
-
-    return actions
+    return []
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
