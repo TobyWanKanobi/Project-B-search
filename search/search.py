@@ -115,8 +115,33 @@ def depthFirstSearch(problem):
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    fringe = util.Queue() # Enige verschil met DFS
+    fringe.push((problem.getStartState(), []))
+    visited = []
+
+    while not fringe.isEmpty():
+
+        # verkrijg locatie en acties uit fringe
+        location, actions = fringe.pop()
+
+        # return acties wanneer doelstate bereikt is
+        if problem.isGoalState(location):
+            return actions
+
+        # Locatie is al een keer bezocht... ga direct naar volgende iteratie
+        if location in visited:
+            continue
+
+        # Markeer locatie als bezocht
+        visited.append(location)
+
+        # Klap node uit
+        successors = problem.getSuccessors(location)
+        for state, action, cost in successors:
+            fringe.push((state, actions + [action]))
+
+    return []
+
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
