@@ -288,12 +288,22 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        self.visitedCorners = []
+        self.goalState = []
+
+        for corner in self.corners:
+            isVisited = corner == self.startingPosition
+            self.goalState.append((corner, True))
+            self.visitedCorners.append((corner, isVisited))
+
+        self.startState = (self.startingPosition, tuple(self.visitedCorners))
 
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
+        return self.startState
         "*** YOUR CODE HERE ***"
         util.raiseNotDefined()
 
@@ -301,6 +311,7 @@ class CornersProblem(search.SearchProblem):
         """
         Returns whether this search state is a goal state of the problem.
         """
+        return state[1] == tuple(self.goalState)
         "*** YOUR CODE HERE ***"
         util.raiseNotDefined()
 
@@ -325,8 +336,26 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            x, y = state[0]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y+dy)
+            hitsWall = self.walls[nextx][nexty]
+
+            visitedCorners = list(state[1])
+            if not hitsWall:
+                if (nextx, nexty) in self.corners:
+
+                    # Loop door bezochte hoeken
+                    for i in range(len(visitedCorners)):
+                        if visitedCorners[i][0] == (nextx, nexty):
+                            # Overschrijf index (markeer hoek als bezocht)
+                            visitedCorners[i] = ((nextx, nexty), True)
+
+                nextState = ((nextx, nexty), tuple(visitedCorners))
+                successors.append((nextState, action, 1))
 
         self._expanded += 1 # DO NOT CHANGE
+
         return successors
 
     def getCostOfActions(self, actions):
