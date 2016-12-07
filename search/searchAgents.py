@@ -40,6 +40,7 @@ from game import Actions
 import util
 import time
 import search
+from random import randint
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -393,7 +394,29 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+
+    corners = problem.corners  # These are the corner coordinates
+    walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
+    def cornersNotVisited(corners):
+        notVisitedCorners = []
+        for corner, visited in corners:
+            if not visited:
+                notVisitedCorners.append(corner)
+
+        return notVisitedCorners
+
+    currentPos = tuple(state[0])
+
+    heuristicCost = 0
+    cornersLeft = list(cornersNotVisited(state[1]))
+    while len(cornersLeft) > 0:
+        minDist, nearCorner = min([(util.manhattanDistance(currentPos, corner), corner) for corner in cornersLeft],
+                                  key=lambda x: x[0])
+        heuristicCost += minDist
+        currentPos = tuple(nearCorner)
+        cornersLeft.remove(nearCorner)
+
+    return heuristicCost # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -517,8 +540,8 @@ class ClosestDotSearchAgent(SearchAgent):
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
 
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        actions = search.bfs(problem)
+        return actions
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -552,9 +575,11 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         complete the problem definition.
         """
         x,y = state
+        
+        return self.food[x][y]
 
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+
 
 def mazeDistance(point1, point2, gameState):
     """
