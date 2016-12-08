@@ -408,7 +408,7 @@ def cornersHeuristic(state, problem):
         cost += distance
         pos = currentCorner
         remainingCorners.remove(currentCorner)
-    return cost;
+    return cost/2; 
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
